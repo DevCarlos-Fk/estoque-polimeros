@@ -1,0 +1,113 @@
+// app/page.tsx
+import { getEstoque, cadastrarPolimero } from './actions'
+
+export default async function DashboardEstoque() {
+  const estoque = await getEstoque()
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-8 font-sans">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Cabeçalho */}
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Controle de Estoque — Polímeros</h1>
+          <p className="text-gray-600">Alocação, rastreabilidade de lotes e status de liberação.</p>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Formulário de Cadastro */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-fit">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Alocar Novo Material</h2>
+            
+            <form action={cadastrarPolimero} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Material</label>
+                <input required type="text" name="nome" placeholder="Ex: PEBD, PP, PS" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Lote</label>
+                <input required type="text" name="lote" placeholder="Ex: LOT-2026-09" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Rua Armazenada</label>
+                <input required type="text" name="ruaArmazenada" placeholder="Ex: Rua B - Prateleira 3" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status de Liberação</label>
+                <select name="statusLiberacao" className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="Aguardando Análise">Aguardando Análise</option>
+                  <option value="Liberado">Liberado</option>
+                  <option value="Retido / Bloqueado">Retido / Bloqueado</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Dia de Chegada</label>
+                <input required type="date" name="diaChegada" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+
+              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+                Dar Entrada no Estoque
+              </button>
+            </form>
+          </div>
+
+          {/* Tabela de Visualização do Estoque */}
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-800">Materiais em Estoque</h2>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50 text-gray-600 text-xs uppercase font-semibold border-b border-gray-200">
+                    <th className="px-6 py-3">Material</th>
+                    <th className="px-6 py-3">Lote</th>
+                    <th className="px-6 py-3">Endereço (Rua)</th>
+                    <th className="px-6 py-3">Status</th>
+                    <th className="px-6 py-3">Chegada</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
+                  {estoque.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-10 text-center text-gray-400">
+                        Nenhum polímero alocado no momento.
+                      </td>
+                    </tr>
+                  ) : (
+                    estoque.map((item) => (
+                      <tr key={item.id} className="hover:bg-gray-50 transition">
+                        <td className="px-6 py-4 font-medium text-gray-950">{item.nome}</td>
+                        <td className="px-6 py-4 font-mono text-xs">{item.lote}</td>
+                        <td className="px-6 py-4">{item.ruaArmazenada}</td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            ${item.statusLiberacao === 'Liberado' ? 'bg-green-100 text-green-800' : 
+                              item.statusLiberacao === 'Aguardando Análise' ? 'bg-yellow-100 text-yellow-800' : 
+                              'bg-red-100 text-red-800'}`}
+                          >
+                            {item.statusLiberacao}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-gray-500">
+                          {new Date(item.diaChegada).toLocaleDateString('pt-BR')}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+}
