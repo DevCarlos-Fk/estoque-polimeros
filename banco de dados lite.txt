@@ -1,0 +1,21 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-client"
+}
+
+model Polimero {
+  id               String   @id @default(uuid())
+  nome             String   // Ex: Polietileno (PE), Polipropileno (PP)
+  lote             String   // Número do lote do fornecedor
+  ruaArmazenada    String   // Localização física no galpão
+  statusLiberacao  String   // Ex: Liberado, Retido, Em Análise
+  diaChegada       DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
